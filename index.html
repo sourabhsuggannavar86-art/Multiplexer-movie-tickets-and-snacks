@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiplex - Movie & Snack POS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h2>🎬 MULTIPLEX</h2>
+    <nav>
+      <button onclick="showPage('home')">Home</button>
+      <button onclick="showPage('movies')">Movies</button>
+      <button onclick="showPage('pos')">Snack POS</button>
+      <button onclick="showPage('account')">My Bookings</button>
+      <button onclick="showPage('admin')">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="page">
+      <h1>Welcome to Multiplex</h1>
+      <p>Your complete movie and snack booking experience.</p>
+
+      <div class="dashboard">
+        <div class="card" onclick="showPage('movies')">
+          <h2>🎥</h2>
+          <h3>Book Movie Tickets</h3>
+          <p>Choose movies and book your seats.</p>
+        </div>
+
+        <div class="card" onclick="showPage('pos')">
+          <h2>🍿</h2>
+          <h3>Snack Counter POS</h3>
+          <p>Order snacks and generate bills.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="movies" class="page hidden">
+      <h1>Now Showing</h1>
+      <div class="filters">
+        <select id="languageFilter" onchange="renderMovies()">
+          <option value="All">All languages</option>
+        </select>
+        <select id="genreFilter" onchange="renderMovies()">
+          <option value="All">All genres</option>
+        </select>
+      </div>
+      <div id="movieList" class="dashboard"></div>
+    </section>
+
+    <section id="account" class="page hidden">
+      <h1>My Account & Bookings</h1>
+      <div class="account-layout">
+        <form id="accountForm" class="account-card" onsubmit="saveAccount(event)">
+          <h2>Customer Details</h2>
+          <input id="customerName" type="text" placeholder="Full name" required>
+          <input id="customerEmail" type="email" placeholder="Email address" required>
+          <input id="customerPhone" type="tel" placeholder="Phone number" required>
+          <button type="submit" class="checkout">Save Account</button>
+        </form>
+        <div class="account-card">
+          <h2>Booking History</h2>
+          <div id="bookingHistory">No bookings yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin" class="page hidden">
+      <div id="adminLogin" class="admin-login">
+        <div class="account-card">
+          <h1>Admin Login</h1>
+          <p>Demo credentials: admin / 1234</p>
+          <input id="adminUsername" type="text" placeholder="Username">
+          <input id="adminPassword" type="password" placeholder="Password">
+          <button class="checkout" onclick="loginAdmin()">Login</button>
+        </div>
+      </div>
+
+      <div id="adminDashboard" class="hidden">
+        <div class="admin-heading">
+          <h1>Management Dashboard</h1>
+          <div>
+            <button onclick="exportReport('csv')">Export Excel CSV</button>
+            <button onclick="exportReport('pdf')">Export PDF / Print</button>
+            <button onclick="logoutAdmin()">Logout</button>
+          </div>
+        </div>
+
+        <div class="dashboard" id="adminMetrics"></div>
+
+        <div class="admin-grid">
+          <div class="account-card">
+            <h2>Revenue Reports</h2>
+            <div id="revenueReports"></div>
+          </div>
+          <div class="account-card">
+            <h2>Screen Occupancy</h2>
+            <div id="occupancyReports"></div>
+          </div>
+          <div class="account-card">
+            <h2>Cashier & Payment Reports</h2>
+            <div id="cashierReports"></div>
+          </div>
+          <div class="account-card">
+            <h2>GST & Inventory Reports</h2>
+            <div id="gstReports"></div>
+          </div>
+          <div class="account-card">
+            <h2>Expense Management</h2>
+            <input id="expenseName" type="text" placeholder="Expense name">
+            <input id="expenseAmount" type="number" min="1" placeholder="Amount">
+            <button onclick="addExpense()">Add Expense</button>
+            <div id="expenseList"></div>
+          </div>
+          <div class="account-card">
+            <h2>Profit & Loss</h2>
+            <div id="profitReport"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pos" class="page hidden">
+      <h1>Snack Counter POS</h1>
+
+      <div class="pos-layout">
+        <div>
+          <div class="pos-toolbar">
+            <select id="cashierSelect" onchange="setCashier(this.value)">
+              <option value="Cashier One">Cashier One</option>
+              <option value="Cashier Two">Cashier Two</option>
+              <option value="Manager">Manager</option>
+            </select>
+            <select id="categoryFilter" onchange="renderProducts()">
+              <option value="All">All categories</option>
+              <option value="Popcorn">Popcorn</option>
+              <option value="Beverages">Beverages</option>
+              <option value="Pizza">Pizza</option>
+              <option value="Burgers">Burgers</option>
+              <option value="Snacks">Snacks</option>
+            </select>
+            <input id="barcodeInput" type="text" placeholder="Scan / enter barcode">
+            <button onclick="scanBarcode()">Scan</button>
+          </div>
+          <h2>Products</h2>
+          <div id="productList" class="products"></div>
+        </div>
+
+        <div class="cart">
+          <h2>Current Order</h2>
+          <div id="cartItems">No items added</div>
+          <input id="posPromo" placeholder="Coupon code">
+          <button onclick="applyPosCoupon()">Apply Coupon</button>
+          <div id="posTotals">
+            <p>Subtotal: ₹<span id="subtotal">0</span></p>
+            <p>Discount: ₹<span id="discount">0</span></p>
+            <p>GST (5%): ₹<span id="gst">0</span></p>
+            <h3>Grand Total: ₹<span id="total">0</span></h3>
+          </div>
+          <button onclick="holdOrder()">Hold Order</button>
+          <button onclick="showHeldOrders()">Resume Held Order</button>
+          <button class="checkout" onclick="openPayment()">Checkout</button>
+        </div>
+      </div>
+
+      <div class="pos-panels">
+        <div class="account-card">
+          <h2>Combo Offers</h2>
+          <div id="comboList"></div>
+        </div>
+        <div class="account-card">
+          <h2>Kitchen Orders</h2>
+          <div id="kitchenOrders">No active kitchen orders.</div>
+        </div>
+        <div class="account-card">
+          <h2>Inventory Alerts</h2>
+          <div id="inventoryAlerts"></div>
+        </div>
+        <div class="account-card">
+          <h2>Transaction Management</h2>
+          <button onclick="voidTransaction()">Void / Refund</button>
+          <div id="transactionList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="bookingModal" class="modal hidden" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeBookingModal()" aria-label="Close">&times;</button>
+      <div id="bookingSteps"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
